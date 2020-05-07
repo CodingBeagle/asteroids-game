@@ -1,17 +1,26 @@
-#include <iostream>
-#include <vector>
-#include <string>
-
-using namespace std;
+#include <GLFW/glfw3.h>
 
 int main()
 {
-    vector<string> msg { "Hello", "C++", "World", "from", "Vs Code", "and the C++ extension!" };
+    GLFWwindow* window;
 
-    for (const string& word : msg)
+    // Initialize GLFW
+    if (!glfwInit())
+        return -1;
+
+    // Create a windowed window and OpenGL context
+    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    if (!window)
     {
-        cout << word << " ";
+        glfwTerminate();
+        return -1;
     }
 
-    cout << endl;
+    // Make the window's context current
+    glfwMakeContextCurrent(window);
+
+    while (!glfwWindowShouldClose(window)) {
+        // Render here
+        glfwPollEvents();
+    }
 }
