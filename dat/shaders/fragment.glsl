@@ -1,3 +1,6 @@
+/*
+    The purpose of any fragment shader is to set the RGB color of a pixel to be displayed.
+*/
 #version 330
 
 out vec4 color;
