@@ -21,13 +21,19 @@ find_library(GLFW glfw3dll-debug-x64 HINTS "dependencies/glfw")
 
 # The add_executable command is used to produce an executable based on a list of source files.
 # The first argument, the name, will be the name used for the produced executable.
-add_executable(asteroidsgame src/main.cpp src/glad.c)
+add_executable(asteroidsgame src/main.cpp src/glad.c src/filehelper.cpp)
 
 # I use target_link_libraries to specify a library that should be linked to a specific target.
 target_link_libraries(asteroidsgame ${GLFW})
 
 add_custom_command(
     TARGET asteroidsgame POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    COMMAND ${CMAKE_COMMAND} -E copy
     "${PROJECT_SOURCE_DIR}/dependencies/GLFW/glfw3.dll"
     $<TARGET_FILE_DIR:asteroidsgame>)
+
+add_custom_command(
+    TARGET asteroidsgame POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${PROJECT_SOURCE_DIR}/dat"
+    "$<TARGET_FILE_DIR:asteroidsgame>/dat")
