@@ -40,10 +40,14 @@ int main()
     glfwMakeContextCurrent(window);
 
     // Load OpenGl functions
-    if (!gladLoadGL()) {
+    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD!" << std::endl;
         return -1;
     }
+
+    // In order to generate debug messages from OpenGl, we have to enable GL_DEBUG_OUTPUT
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(opengl_debug_message, nullptr);
 
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.392f, 0.584f, 0.929f, 1.0f);
@@ -53,4 +57,7 @@ int main()
 
         glfwPollEvents();
     }
+
+    glfwTerminate();
+    return 0;
 }
