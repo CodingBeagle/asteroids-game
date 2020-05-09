@@ -5,8 +5,10 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <utility>
 
 #include <filehelper.h>
+#include <shader.hpp>
 
 void APIENTRY opengl_debug_message(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
@@ -58,21 +60,12 @@ int main()
     std::string vertex_shader_source_code = read_text_file("dat/shaders/vertex.glsl");
     std::string fragment_shader_source_code = read_text_file("dat/shaders/fragment.glsl");
 
-    GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-
-    const char *v_shader_source = vertex_shader_source_code.c_str();
-    const char *f_shader_source = fragment_shader_source_code.c_str();
-
-    glShaderSource(vertex_shader, 1, &v_shader_source, nullptr);
-    glShaderSource(fragment_shader, 1, &f_shader_source, nullptr);
-
-    glCompileShader(vertex_shader);
-    glCompileShader(fragment_shader);
+    Shader vertex_shader = Shader(GL_VERTEX_SHADER, vertex_shader_source_code);
+    Shader fragment_shader = Shader(GL_FRAGMENT_SHADER, fragment_shader_source_code);
 
     GLuint shader_program = glCreateProgram();
-    glAttachShader(shader_program, vertex_shader);
-    glAttachShader(shader_program, fragment_shader);
+    glAttachShader(shader_program, vertex_shader.get_object_id());
+    glAttachShader(shader_program, fragment_shader.get_object_id());
 
     glLinkProgram(shader_program);
 
@@ -99,4 +92,9 @@ int main()
 
     glfwTerminate();
     return 0;
+}
+
+void lol(Shader shader)
+{
+
 }
