@@ -81,7 +81,7 @@ int main()
 
         // glDrawArrays is one of several OpenGL commands which initiates the graphics pipeline processing.
         glPointSize(30.0f);
-        glDrawArrays(GL_POINTS, 0, 1);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

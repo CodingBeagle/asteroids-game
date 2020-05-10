@@ -2,16 +2,17 @@
 
 std::string read_text_file(std::string filepath)
 {
-    std::ifstream vertex_shader_file(filepath);
-    std::string vertex_shader_source_code;
+    std::ifstream file_handle(filepath);
+    std::string file_content;
 
     // TODO: Need proper error handling mechanism here
-    if (vertex_shader_file.is_open())
+    if (file_handle.is_open())
     {
         std::stringstream buffer;
-        buffer << vertex_shader_file.rdbuf();
-        vertex_shader_source_code = std::string(buffer.str());
+        buffer << file_handle.rdbuf();
+        file_content = std::string(buffer.str());
+        file_handle.close();
     }
 
-    return vertex_shader_source_code;
+    return file_content;
 }
