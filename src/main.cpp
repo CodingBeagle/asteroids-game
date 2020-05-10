@@ -9,6 +9,7 @@
 
 #include <filehelper.h>
 #include <shader.hpp>
+#include <shaderprogram.hpp>
 
 void APIENTRY opengl_debug_message(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
@@ -60,14 +61,10 @@ int main()
     std::string vertex_shader_source_code = read_text_file("dat/shaders/vertex.glsl");
     std::string fragment_shader_source_code = read_text_file("dat/shaders/fragment.glsl");
 
-    Shader vertex_shader = Shader(GL_VERTEX_SHADER, vertex_shader_source_code);
-    Shader fragment_shader = Shader(GL_FRAGMENT_SHADER, fragment_shader_source_code);
+    Shader vertex_shader(GL_VERTEX_SHADER, vertex_shader_source_code);
+    Shader fragment_shader(GL_FRAGMENT_SHADER, fragment_shader_source_code);
 
-    GLuint shader_program = glCreateProgram();
-    glAttachShader(shader_program, vertex_shader.get_object_id());
-    glAttachShader(shader_program, fragment_shader.get_object_id());
-
-    glLinkProgram(shader_program);
+    ShaderProgram shaderProgram(vertex_shader, fragment_shader);
 
     // OpenGL requires that at least one VAO be created whenever shaders are being used, even if
     // the application isn't using any buffers.
@@ -80,7 +77,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // glUseProgram will load the compiled shaders onto the GPU hardware.
-        glUseProgram(shader_program);
+        shaderProgram.activate();
 
         // glDrawArrays is one of several OpenGL commands which initiates the graphics pipeline processing.
         glPointSize(30.0f);

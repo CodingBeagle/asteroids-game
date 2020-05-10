@@ -9,7 +9,6 @@ Shader::Shader(GLuint shader_type, std::string shader_source_code)
     const char *shader_source_c_str = shader_source_code.c_str();
 
     glShaderSource(m_shader_object_id, 1, &shader_source_c_str, nullptr);
-
     glCompileShader(m_shader_object_id);
 
     // glGetShaderiv can be used to return a parameter from a shader object.
@@ -33,14 +32,14 @@ Shader::~Shader()
     m_shader_object_id = 0;
 }
 
-GLuint Shader::get_object_id()
+GLuint Shader::get_object_id() const
 {
     return m_shader_object_id;
 }
 
 void Shader::print_compilation_log()
 {
-    GLint log_length = 0;
+    GLint log_length {0};
 
     // Get the length of the info log
     glGetShaderiv(m_shader_object_id, GL_INFO_LOG_LENGTH, &log_length);
@@ -56,7 +55,7 @@ void Shader::print_compilation_log()
 
         std::cout << "Shader Info Log:" << std::endl;
         std::cout << log_content << std::endl;
-
-        exit(-1);
     }
+
+    exit(-1);
 }

@@ -9,7 +9,7 @@ class Shader
 {
 public:
     explicit Shader(GLuint shader_type, std::string shader_source_code);
-    GLuint get_object_id();
+    GLuint get_object_id() const;
 
     // Disable copy operators
     Shader(const Shader&) = delete; // Copy constructor
