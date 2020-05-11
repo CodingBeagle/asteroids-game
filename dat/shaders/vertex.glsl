@@ -1,8 +1,17 @@
 #version 330
 
+// I declare a vertex attribute variable
+// key "in" = input. Used to indicate that the vertex attribute receives values from a buffer.
+// layout (location 0) = layout qualifier
+layout (location = 0) in vec3 position;
+
+// Model-View Matrix
+uniform mat4 mv_matrix;
+
+// Projection Matrix
+uniform mat4 proj_matrix;
+
 void main(void)
 {
-    if (gl_VertexID == 0) gl_Position = vec4(0.25, -0.25, 0.0, 1.0);
-    else if (gl_VertexID == 1) gl_Position = vec4(-0.25, -0.25, 0.0, 1.0);
-    else gl_Position = vec4(0.25, 0.25, 0.0, 1.0);
+    gl_Position = vec4(position, 1.0);
 }
