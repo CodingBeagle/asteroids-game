@@ -1,6 +1,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+// TODO: Including both glm.hpp and ext.hpp is convinient for many cases however build times
+// Increase significantly because it includes a lot of code. Recommended approach is to include
+// header files specific to the types you need.
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -20,9 +26,9 @@ void APIENTRY opengl_debug_message(GLenum source, GLenum type, GLuint id, GLenum
 
 float vertices[] = {
     // Triangle One
-     0.25f, -0.25f, 0.0f,
-    -0.25f, -0.25f, 0.0f,
-     0.25f,  0.25,  0.0f,
+     0.0f, 0.0f, 0.0f,
+    100.0f, 0.0f, 0.0f,
+     100.0f, 100.0f, 0.0f
     };
 
 int main()
@@ -110,12 +116,17 @@ int main()
     // We have to enable it by calling glEnableVertexAttribArray.
     glEnableVertexAttribArray(0);
 
+    glm::mat4 projection = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, -1.0f, 1.0f);
+
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.392f, 0.584f, 0.929f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         // glUseProgram will load the compiled shaders onto the GPU hardware.
         shaderProgram.activate();
+
+        // Set Projection Matrix uniform
+        shaderProgram.set_uniform_value("proj_matrix", projection);
 
         // glDrawArrays is one of several OpenGL commands which initiates the graphics pipeline processing.
         glPointSize(30.0f);

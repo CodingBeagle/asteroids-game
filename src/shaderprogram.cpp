@@ -54,3 +54,20 @@ void ShaderProgram::deactivate()
 {
     glUseProgram(0);
 }
+
+void ShaderProgram::set_uniform_value(std::string uniformName, glm::mat4 value)
+{
+    // glGetUniformLocation will return an integer representing the location of the
+    // Uniform variable in the shader.
+    // Will return -1 if the name doesn't match any uniform variable in the active shader.
+    GLuint index = glGetUniformLocation(m_shader_program_object_id, uniformName.c_str());
+
+    // TODO: Proper error handling
+    if (index == -1)
+    {
+        std::cout << "Failed to find uniform variable with name " << uniformName << std::endl;
+        exit(1);
+    }
+
+    glUniformMatrix4fv(index, 1, GL_FALSE, glm::value_ptr(value));
+}

@@ -4,6 +4,10 @@
 #include <memory>
 #include <glad/glad.h>
 #include <shader.hpp>
+#include <string>
+
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
 
 class ShaderProgram
 {
@@ -13,6 +17,8 @@ public:
 
     void activate();
     void deactivate();
+
+    void set_uniform_value(std::string uniformName, glm::mat4 value);
 
     // Disable copy semantics
     ShaderProgram(const ShaderProgram&) = delete; // Copy Constructor
