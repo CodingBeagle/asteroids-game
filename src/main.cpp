@@ -7,6 +7,9 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -125,9 +128,24 @@ int main()
     float camera_offset_height = 600.0f / 2.0f;
     glm::vec2 camera_position = glm::vec2(0.0f, 0.0f);
 
-    glm::vec2 sprite_position = glm::vec2(200.0f, 100.0f);
+    glm::vec2 sprite_position = glm::vec2(0.0f, 0.0f);
     glm::vec2 sprite_size = glm::vec2(50.0f, 100.0f);
     float sprite_angle = 0.0f;
+
+    // Load a texture
+    int x, y, n;
+    unsigned char* image_data = stbi_load("dat/textures/dachshund.png", &x, &y, &n, 0);
+
+    GLuint texture_object{0};
+    glGenTextures(1, &texture_object);
+
+    // Binding our created texture_object to GL_TEXTURE_2D means it becomes a 2D texture.
+    glBindTexture(GL_TEXTURE_2D, texture_object);
+
+    // Creating a storage for a texture and uploading pixels to it is done with glTexImage2D.
+    // InternalFormat parameter (Parameter 3) = Tell OpenGL how you want the texture to be stored on the GPU.
+    // The External Format is defined by parameters "format", and "type". 
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
 
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.392f, 0.584f, 0.929f, 1.0f);
