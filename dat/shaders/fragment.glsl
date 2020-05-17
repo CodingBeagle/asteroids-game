@@ -3,9 +3,16 @@
 */
 #version 330
 
+// Interpolated incoming texture coordinate
+in vec2 fragment_texture_coordinate;
+
+// Declare a Sampler2D so we can sample colors from a loaded texture from our application.
+// "binding = 0" means that the sampler will be associated with texture unit 0.
+uniform sampler2D texture_sampler;
+
 out vec4 color;
 
 void main(void) 
 {
-    color = vec4(1.0, 0.0, 0.0, 1.0);
+    color = texture(texture_sampler, fragment_texture_coordinate);
 }

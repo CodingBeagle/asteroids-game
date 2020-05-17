@@ -28,14 +28,26 @@ void APIENTRY opengl_debug_message(GLenum source, GLenum type, GLuint id, GLenum
 }
 
 float vertices[] = {
-    // Triangle One
-     -0.5f,   -0.5f,    0.0f,
-      0.5f,   -0.5f,    0.0f,
-      0.5f,    0.5f,    0.0f,
-     -0.5f,   -0.5f,    0.0f,
-      0.5f,    0.5f,    0.0f,
-     -0.5f,    0.5f,    0.0f,
+      // Triangle One
+     -0.5f,   -0.5f,    0.0f, // Top Left
+      0.5f,   -0.5f,    0.0f, // Top Right
+      0.5f,    0.5f,    0.0f, // Bottom Right
+      // Triangle Two
+     -0.5f,   -0.5f,    0.0f, // Top Left
+      0.5f,    0.5f,    0.0f, // Bottom Right
+     -0.5f,    0.5f,    0.0f, // Bottom Left
     };
+
+float texture_coordinates[] = {
+    // Triangle One
+    0.0f, 0.0f, // Top Left
+    1.0f, 0.0f, // Top Right
+    1.0f, 1.0f, // Bottom Right
+    // Triangle Two
+    0.0f, 0.0f, // Top Left
+    1.0f, 1.0f, // Bottom Right
+    0.0f, 1.0f, // Bottom Left
+};
 
 int main()
 {
@@ -75,6 +87,23 @@ int main()
     // In order to generate debug messages from OpenGl, we have to enable GL_DEBUG_OUTPUT
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(opengl_debug_message, nullptr);
+
+    // In order to render images with different levels of transparency, we have to enable blending in OpenGL
+    glEnable(GL_BLEND);
+
+    // Describe the blend function.
+    // Source Factor is the pixel's alpha value. All color components of the source pixel is multiplied by this factor.
+    // Destination Factor is determined by 1-a (where a is the alpha value of the source pixel). All color components of the destination pixel is multiplied by this factor.
+    // So if our source pixel was the following: (1.0f, 0.0f, 0.0f, 0.75f) (A red color with half transparency)
+    // And our destination pixel was: (1.0f, 1.0f, 1.0f, 1.0f) (white color, full transparency)
+    // The final result would be:
+    // Source Pixel with source factor: (0.75f, 0.0f, 0.0f, 0.5625f)
+    // Destination Pixel: (1.0f - 0.75f, 1.0f - 0.75f, 1.0f - 0.75f, 1.0f - 0.75f) = (0.25f, 0.25f, 0.25f, 0.25f)
+    // Final Result = (0.75f, 0.0f, 0.0f, 0.525f) + (0.25f, 0.25f, 0.25f, 0.25f) = (1.0f, 0.25f, 0.25f, ...)
+    // That would result in predominently red with some white in it.
+    // NOTICE that this assumes that glBlendEquation = GL_FUNC_ADD, which it is by default
+    // By default, glBlendFunc is set to GL_ONE for srcFactor and GL_ZERO for destFactor. Which basically means that you always render with full opacity for whatever is being rendered.
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Shader stuff
     std::string vertex_shader_source_code = read_text_file("dat/shaders/vertex.glsl");
@@ -116,11 +145,56 @@ int main()
     // Parameter 6 = Pointer. AN offset to the first component of the first vertex attribute.
     // -- No offset for us. When this parameter is 0, a buffer has to be bound to GL_ARRAY_BUFFER,
     // -- Which we have done above.
+    // When this function is called, it is saved as vertex array state for the buffer currently bound
+    // Therefore, we can re-bind GL_ARRAY_BUFFER for texture coordinates later, and call glVertexAttribPointer
+    // for the texture coordinate at that point in time, which will then be saved for the buffer bound at that point.
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     // In order to have the vertex attribute in the shader be used during a draw call,
     // We have to enable it by calling glEnableVertexAttribArray.
     glEnableVertexAttribArray(0);
+
+    // Upload texture coordinates
+    GLuint texture_coordinates_vbo;
+    glGenBuffers(1, &texture_coordinates_vbo);
+
+    glBindBuffer(GL_ARRAY_BUFFER, texture_coordinates_vbo);
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(texture_coordinates), texture_coordinates, GL_STATIC_DRAW);
+
+    // Enable vertex attribute in our vertex shader for texture coordinates
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+    // I enable vertex attribute location 1 so that texture coordinate data can flow to the vertex shader.
+    glEnableVertexAttribArray(1);
+
+    // Load a texture
+    int x, y, n;
+    unsigned char* image_data = stbi_load("dat/textures/doggo.png", &x, &y, &n, 0);
+
+    GLuint texture_object{0};
+    glGenTextures(1, &texture_object);
+
+    // glActiveTexture selects which texture unit subsequent texture state calls will affect.
+    // The initial value is GL_TEXTURE0 (texture unit 0), so technically we don't have to call this.
+    // But it's good to be explicit.
+    glActiveTexture(GL_TEXTURE0);
+
+    // Binding our created texture object to GL_TEXTURE_2D means it becomes a 2D texture.
+    glBindTexture(GL_TEXTURE_2D, texture_object);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Creating a storage for a texture and uploading pixels to it is done with glTexImage2D.
+    // InternalFormat parameter (Parameter 3) = Tell OpenGL how you want the texture to be stored on the GPU.
+    // The External Format is defined by parameters "format", and "type". 
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+
+    // OpenGL can automatically generate mipmaps for us by calling glGenerateMipmap. This is typically sufficient for most applications.
+    glGenerateMipmap(GL_TEXTURE_2D);
 
     glm::mat4 projection = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, 1.0f, -1.0f);
 
@@ -129,23 +203,8 @@ int main()
     glm::vec2 camera_position = glm::vec2(0.0f, 0.0f);
 
     glm::vec2 sprite_position = glm::vec2(0.0f, 0.0f);
-    glm::vec2 sprite_size = glm::vec2(50.0f, 100.0f);
+    glm::vec2 sprite_size = glm::vec2(x * 0.5f, y * 0.5f);
     float sprite_angle = 0.0f;
-
-    // Load a texture
-    int x, y, n;
-    unsigned char* image_data = stbi_load("dat/textures/dachshund.png", &x, &y, &n, 0);
-
-    GLuint texture_object{0};
-    glGenTextures(1, &texture_object);
-
-    // Binding our created texture_object to GL_TEXTURE_2D means it becomes a 2D texture.
-    glBindTexture(GL_TEXTURE_2D, texture_object);
-
-    // Creating a storage for a texture and uploading pixels to it is done with glTexImage2D.
-    // InternalFormat parameter (Parameter 3) = Tell OpenGL how you want the texture to be stored on the GPU.
-    // The External Format is defined by parameters "format", and "type". 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
 
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.392f, 0.584f, 0.929f, 1.0f);
@@ -154,7 +213,7 @@ int main()
         // glUseProgram will load the compiled shaders onto the GPU hardware.
         shaderProgram.activate();
 
-        sprite_angle += 0.5f;
+        // sprite_angle += 0.5f;
 
         // VIEW MATRIX
         // The mat4 constructor takes a single number, which is used to initialize the diagonal of a matrix
