@@ -7,18 +7,18 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.h>
-
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <sstream>
 #include <utility>
 
+#define STB_IMAGE_IMPLEMENTATION
+
 #include <filehelper.h>
 #include <shader.hpp>
 #include <shaderprogram.hpp>
+#include <texture.hpp>
 
 void APIENTRY opengl_debug_message(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
@@ -169,32 +169,8 @@ int main()
     glEnableVertexAttribArray(1);
 
     // Load a texture
-    int x, y, n;
-    unsigned char* image_data = stbi_load("dat/textures/doggo.png", &x, &y, &n, 0);
-
-    GLuint texture_object{0};
-    glGenTextures(1, &texture_object);
-
-    // glActiveTexture selects which texture unit subsequent texture state calls will affect.
-    // The initial value is GL_TEXTURE0 (texture unit 0), so technically we don't have to call this.
-    // But it's good to be explicit.
-    glActiveTexture(GL_TEXTURE0);
-
-    // Binding our created texture object to GL_TEXTURE_2D means it becomes a 2D texture.
-    glBindTexture(GL_TEXTURE_2D, texture_object);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // Creating a storage for a texture and uploading pixels to it is done with glTexImage2D.
-    // InternalFormat parameter (Parameter 3) = Tell OpenGL how you want the texture to be stored on the GPU.
-    // The External Format is defined by parameters "format", and "type". 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-
-    // OpenGL can automatically generate mipmaps for us by calling glGenerateMipmap. This is typically sufficient for most applications.
-    glGenerateMipmap(GL_TEXTURE_2D);
+    Texture texture {"dat/textures/doggo.png"};
+    texture.activate();
 
     glm::mat4 projection = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, 1.0f, -1.0f);
 
@@ -203,7 +179,7 @@ int main()
     glm::vec2 camera_position = glm::vec2(0.0f, 0.0f);
 
     glm::vec2 sprite_position = glm::vec2(0.0f, 0.0f);
-    glm::vec2 sprite_size = glm::vec2(x * 0.5f, y * 0.5f);
+    glm::vec2 sprite_size = glm::vec2(texture.get_width() * 0.5f, texture.get_height() * 0.5f);
     float sprite_angle = 0.0f;
 
     while (!glfwWindowShouldClose(window)) {
