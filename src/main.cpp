@@ -172,6 +172,10 @@ int main()
     Texture texture {"dat/textures/doggo.png"};
     texture.activate();
 
+    int mynumber = 5;
+    int &num_ref = mynumber;
+    num_ref = 10;
+
     glm::mat4 projection = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, 1.0f, -1.0f);
 
     float camera_offset_width = 800.0f / 2.0f;

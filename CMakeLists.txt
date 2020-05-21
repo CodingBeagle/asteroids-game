@@ -30,7 +30,8 @@ target_sources(asteroidsgame
                 src/filehelper.cpp
                 src/shader.cpp
                 src/shaderprogram.cpp
-                src/texture.cpp)
+                src/texture.cpp
+                src/sprite.cpp)
 
 # Add GLFW header files to search path for build
 target_include_directories(asteroidsgame PUBLIC "dependencies/GLFW/include")

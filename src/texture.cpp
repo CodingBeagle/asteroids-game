@@ -46,23 +46,23 @@ Texture::Texture(std::string filepath)
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Texture::activate()
+void Texture::activate() const
 {
     glBindTexture(GL_TEXTURE_2D, m_texture_object);
 }
 
-void Texture::deactivate()
+void Texture::deactivate() const
 {
     // The texture name 0 refers to the default texture bound at initialization
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-int Texture::get_width()
-{
+int Texture::get_width() const
+{ 
     return m_texture_width;
 }
 
-int Texture::get_height()
+int Texture::get_height() const
 {
     return m_texture_height;
 }
