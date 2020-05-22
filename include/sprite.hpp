@@ -14,13 +14,20 @@ public:
     void set_position(glm::vec2 position);
     glm::vec2 get_position() const;
 
+    float get_angle_in_degrees() const;
+
+    glm::vec2 get_size() const;
+
     glm::vec4 get_sub_rectangle() const;
 
     void set_absolute_scale(glm::vec2 scale);
+
+    void activate_texture() const;
 private:
     const Texture &m_texture;
     glm::vec2 m_position;
     glm::vec2 m_scale;
     glm::vec2 m_size;
     glm::vec4 m_sub_rectangle;
+    float m_angle;
 };

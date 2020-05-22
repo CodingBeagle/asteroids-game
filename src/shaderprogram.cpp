@@ -1,5 +1,7 @@
 #include <shaderprogram.hpp>
 
+ShaderProgram::ShaderProgram() : m_shader_program_object_id{0} {}
+
 ShaderProgram::ShaderProgram(const Shader& vertexShader, const Shader& fragmentShader)
     : m_shader_program_object_id{0}
 {
