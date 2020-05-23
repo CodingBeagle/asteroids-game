@@ -13,6 +13,8 @@ int main()
 {
     GLFWwindow* window;
 
+
+
     // Initialize GLFW
     if (!glfwInit()) {
         std::cout << "Failed to initialize GLFW" << std::endl;
@@ -50,8 +52,10 @@ int main()
     // Load a texture
     Texture texture {"dat/textures/doggo.png"};
 
-    Sprite dog_sprite{texture};
-    dog_sprite.set_absolute_scale(glm::vec2(0.5f, 0.5f));
+    // Create a sprite
+    Sprite dog_sprite{texture, glm::vec4(500.0f, 225.0f, 0.0f, 0.0f)};
+    dog_sprite.set_absolute_scale(glm::vec2(0.25f, 0.25f));
+    dog_sprite.set_angle_in_degrees(45.0f);
 
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.392f, 0.584f, 0.929f, 1.0f);

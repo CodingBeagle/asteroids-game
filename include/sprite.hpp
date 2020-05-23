@@ -14,6 +14,7 @@ public:
     void set_position(glm::vec2 position);
     glm::vec2 get_position() const;
 
+    void set_angle_in_degrees(float angle);
     float get_angle_in_degrees() const;
 
     glm::vec2 get_size() const;

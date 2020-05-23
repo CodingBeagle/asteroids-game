@@ -21,6 +21,7 @@ public:
     void deactivate();
 
     void set_uniform_value(std::string uniformName, glm::mat4 value);
+    void set_uniform_value(std::string uniform_name, glm::vec4 value);
 
     // Disable copy semantics
     ShaderProgram(const ShaderProgram&) = delete; // Copy Constructor

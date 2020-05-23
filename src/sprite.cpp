@@ -33,6 +33,11 @@ glm::vec2 Sprite::get_position() const
     return m_position;
 }
 
+void Sprite::set_angle_in_degrees(float angle)
+{
+    m_angle = angle;
+}
+
 float Sprite::get_angle_in_degrees() const
 {
     return m_angle;

@@ -151,6 +151,7 @@ void Renderer2d::render_sprite(const Sprite &sprite)
     // Set Projection Matrix uniform and Model-View Matrix uniform
     m_default_shader_program.set_uniform_value("proj_matrix", m_projection);
     m_default_shader_program.set_uniform_value("mv_matrix", model_view_matrix);
+    m_default_shader_program.set_uniform_value("texture_sub_rectangle", sprite.get_sub_rectangle());
 
     // glDrawArrays is one of several OpenGL commands which initiates the graphics pipeline processing.
     glDrawArrays(GL_TRIANGLES, 0, 6);

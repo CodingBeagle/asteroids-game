@@ -73,3 +73,17 @@ void ShaderProgram::set_uniform_value(std::string uniformName, glm::mat4 value)
 
     glUniformMatrix4fv(index, 1, GL_FALSE, glm::value_ptr(value));
 }
+
+void ShaderProgram::set_uniform_value(std::string uniform_name, glm::vec4 value)
+{
+    GLuint index = glGetUniformLocation(m_shader_program_object_id, uniform_name.c_str());
+
+    // TODO: Proper error handling
+    if (index == -1)
+    {
+        std::cout << "Failed to find uniform variable with name " << uniform_name << std::endl;
+        exit(1);
+    }
+
+    glUniform4fv(index, 1, glm::value_ptr(value));
+}
