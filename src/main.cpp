@@ -57,6 +57,16 @@ int main()
 
     // Font Stuff
 
+    // We use a texture atlas to pack many glyphs from a font into a single texture
+    texture_atlas_t* atlas = texture_atlas_new(512, 512, 1);
+
+    texture_font_t *font = texture_font_new_from_file(atlas, 32, "dat/fonts/Lobster-Regular.ttf");
+    font->rendermode = RENDER_NORMAL;
+
+    texture_glyph_t* a_character = texture_font_get_glyph(font, "a");
+
+    a_character->
+
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.392f, 0.584f, 0.929f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
