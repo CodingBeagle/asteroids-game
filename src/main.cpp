@@ -9,12 +9,10 @@
 #include <texture.hpp>
 #include <sprite.hpp>
 
+#include <freetype-gl/freetype-gl.h>
+
 int main()
 {
-    GLFWwindow* window;
-
-
-
     // Initialize GLFW
     if (!glfwInit()) {
         std::cout << "Failed to initialize GLFW" << std::endl;
@@ -28,7 +26,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 
-    window = glfwCreateWindow(800, 600, "Asteroids Game", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "Asteroids Game", NULL, NULL);
 
     if (!window)
     {
@@ -56,6 +54,8 @@ int main()
     Sprite dog_sprite{texture, glm::vec4(500.0f, 225.0f, 0.0f, 0.0f)};
     dog_sprite.set_absolute_scale(glm::vec2(0.25f, 0.25f));
     dog_sprite.set_angle_in_degrees(45.0f);
+
+    // Font Stuff
 
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.392f, 0.584f, 0.929f, 1.0f);

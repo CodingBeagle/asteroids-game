@@ -18,9 +18,15 @@ project(asteroidsgame)
 # HINTS can be uesd to specify paths to search for the library.
 find_library(GLFW glfw3dll-debug-x64 HINTS "dependencies/glfw")
 
+find_library(FreeType freetype HINTS "dependencies/freetype")
+
+find_library(FreeTypeGl freetype-gl-release HINTS "dependencies/freetype-gl")
+
 # The add_executable command is used to produce an executable based on a list of source files.
 # The first argument, the name, will be the name used for the produced executable.
 add_executable(asteroidsgame)
+
+set_property(TARGET asteroidsgame PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDll")
 
 # Add source files to the target
 target_sources(asteroidsgame
@@ -43,6 +49,10 @@ target_include_directories(asteroidsgame PUBLIC "include")
 # I use target_link_libraries to specify a library that should be linked to a specific target.
 target_link_libraries(asteroidsgame ${GLFW})
 
+target_link_libraries(asteroidsgame ${FreeType})
+
+target_link_libraries(asteroidsgame ${FreeTypeGl})
+
 add_custom_command(
     TARGET asteroidsgame POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
@@ -54,3 +64,9 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${PROJECT_SOURCE_DIR}/dat"
     "$<TARGET_FILE_DIR:asteroidsgame>/dat")
+
+add_custom_command(
+    TARGET asteroidsgame POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    "${PROJECT_SOURCE_DIR}/dependencies/freetype/freetype.dll"
+    $<TARGET_FILE_DIR:asteroidsgame>)
