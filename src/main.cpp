@@ -65,12 +65,37 @@ int main()
 
     texture_glyph_t* a_character = texture_font_get_glyph(font, "a");
 
-    a_character->
+    // Game Loop variables
+    double last_time = glfwGetTime();
+    double lag = 0.0;
+    double fixed_time_step = 1.0 / 60.0;
+
+    // Disable v-sync
+    glfwSwapInterval(0);
 
     while (!glfwWindowShouldClose(window)) {
+        double current_time = glfwGetTime();
+        double elapsed_time = current_time - last_time;
+        last_time = current_time;
+        lag += elapsed_time;
+
+        // Process Input
+
+        // Update
+        while (lag > fixed_time_step)
+        {
+            // Game Logic
+            dog_sprite.set_angle_in_degrees(dog_sprite.get_angle_in_degrees() + 5.0f);
+
+            // Reduce lag
+            lag -= fixed_time_step;
+        }
+
+        // Rendering
         glClearColor(0.392f, 0.584f, 0.929f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
+    	
+        std::cout << "Render!" << std::endl;
         renderer2d.render_sprite(dog_sprite);
 
         glfwSwapBuffers(window);
