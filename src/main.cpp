@@ -63,8 +63,6 @@ int main()
     texture_font_t *font = texture_font_new_from_file(atlas, 32, "dat/fonts/Lobster-Regular.ttf");
     font->rendermode = RENDER_NORMAL;
 
-    texture_glyph_t* a_character = texture_font_get_glyph(font, "a");
-
     // Game Loop variables
     double last_time = glfwGetTime();
     double lag = 0.0;
@@ -94,9 +92,9 @@ int main()
         // Rendering
         glClearColor(0.392f, 0.584f, 0.929f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-    	
-        std::cout << "Render!" << std::endl;
+
         renderer2d.render_sprite(dog_sprite);
+        renderer2d.render_text(*font, "a", glm::vec2());
 
         glfwSwapBuffers(window);
         glfwPollEvents();

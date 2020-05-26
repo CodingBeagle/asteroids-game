@@ -156,3 +156,33 @@ void Renderer2d::render_sprite(const Sprite &sprite)
     // glDrawArrays is one of several OpenGL commands which initiates the graphics pipeline processing.
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
+
+void Renderer2d::render_text(texture_font_t &texture_font, std::string text, glm::vec2 position)
+{
+    // TODO: Make code compatible with UTF8 (might have to not use std::string?)
+
+    // Loop through each character
+    // Get glyph information for character
+    // Create model matrix for glyph
+    // Create model_view matrix for glyph (view just identity)
+    // Set shader uniforms
+
+    for (char &character : text)
+    {
+        std::unique_ptr<texture_glyph_t> glyph_info(texture_font_get_glyph(&texture_font, &character));
+
+        // MODEL MATRIX
+        glm::mat4 model_matrix = glm::mat4(1.0f);
+        model_matrix = glm::translate(model_matrix, glm::vec3(50.0f, 50.0f, 0.0f));
+
+        // VIEW MATRIX
+        glm::mat4 view_matrix = glm::mat4(1.0f);
+
+        // Model-View Matrix
+        glm::mat4 model_view_matrix = view_matrix * model_matrix;
+
+        // Uniform values
+        glm::vec2 font_atlas_position_in_pixels = glm::vec2(texture_font.atlas->width * glyph_info->s1, texture_font.atlas->height * glyph_info->t1);
+        glm::vec4 texture_sub_rectangle = glm::vec4(glyph_info->width, glyph_info->height, font_atlas_position_in_pixels.x, font_atlas_position_in_pixels.y);
+    }
+}
