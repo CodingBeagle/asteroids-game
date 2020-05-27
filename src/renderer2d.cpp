@@ -167,22 +167,40 @@ void Renderer2d::render_text(texture_font_t &texture_font, std::string text, glm
     // Create model_view matrix for glyph (view just identity)
     // Set shader uniforms
 
+    // Activate default shader program
+    m_default_shader_program.activate();
+
+    // Bind font texture
+    glBindTexture(GL_TEXTURE_2D, texture_font.atlas->id);
+
     for (char &character : text)
     {
-        std::unique_ptr<texture_glyph_t> glyph_info(texture_font_get_glyph(&texture_font, &character));
+        texture_glyph_t* glyph_info = texture_font_get_glyph(&texture_font, &character);
 
         // MODEL MATRIX
         glm::mat4 model_matrix = glm::mat4(1.0f);
-        model_matrix = glm::translate(model_matrix, glm::vec3(50.0f, 50.0f, 0.0f));
+        model_matrix = glm::translate(model_matrix, glm::vec3(0.0f, 0.0f, 0.0f));
+        model_matrix = glm::scale(model_matrix, glm::vec3(glyph_info->width, glyph_info->height, 0.0f));
 
         // VIEW MATRIX
         glm::mat4 view_matrix = glm::mat4(1.0f);
+        view_matrix = glm::translate(view_matrix, glm::vec3(m_camera_offset_width, m_camera_offset_height, 0.0f));
+        view_matrix = glm::translate(view_matrix, -1.0f * glm::vec3(m_camera_position, 0.0f));
 
         // Model-View Matrix
         glm::mat4 model_view_matrix = view_matrix * model_matrix;
 
         // Uniform values
-        glm::vec2 font_atlas_position_in_pixels = glm::vec2(texture_font.atlas->width * glyph_info->s1, texture_font.atlas->height * glyph_info->t1);
+        glm::vec2 font_atlas_position_in_pixels = glm::vec2(texture_font.atlas->width * glyph_info->s0, texture_font.atlas->height * glyph_info->t0);
         glm::vec4 texture_sub_rectangle = glm::vec4(glyph_info->width, glyph_info->height, font_atlas_position_in_pixels.x, font_atlas_position_in_pixels.y);
+
+        m_default_shader_program.set_uniform_value("proj_matrix", m_projection);
+        m_default_shader_program.set_uniform_value("mv_matrix", model_view_matrix);
+        m_default_shader_program.set_uniform_value("texture_sub_rectangle", texture_sub_rectangle);
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
+
+    // OpenGL cleanup
+    glBindTexture(GL_TEXTURE_2D, 0);
 }

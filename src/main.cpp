@@ -56,12 +56,23 @@ int main()
     dog_sprite.set_angle_in_degrees(45.0f);
 
     // Font Stuff
+    const char * cache = "abcdev123";
 
     // We use a texture atlas to pack many glyphs from a font into a single texture
     texture_atlas_t* atlas = texture_atlas_new(512, 512, 1);
 
-    texture_font_t *font = texture_font_new_from_file(atlas, 32, "dat/fonts/Lobster-Regular.ttf");
+    texture_font_t *font = texture_font_new_from_file(atlas, 72, "dat/fonts/arial.ttf");
     font->rendermode = RENDER_NORMAL;
+
+    auto waitwut = texture_font_load_glyphs(font, cache);
+    
+    glGenTextures( 1, &atlas->id );
+    glBindTexture( GL_TEXTURE_2D, atlas->id );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RED, atlas->width, atlas->height, 0, GL_RED, GL_UNSIGNED_BYTE, atlas->data );
 
     // Game Loop variables
     double last_time = glfwGetTime();
@@ -94,7 +105,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         renderer2d.render_sprite(dog_sprite);
-        renderer2d.render_text(*font, "a", glm::vec2());
+        renderer2d.render_text(*font, "b", glm::vec2());
 
         glfwSwapBuffers(window);
         glfwPollEvents();
