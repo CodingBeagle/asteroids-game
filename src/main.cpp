@@ -56,7 +56,7 @@ int main()
     dog_sprite.set_angle_in_degrees(45.0f);
 
     // Font Stuff
-    const char * cache = "abcdev123";
+    const char * cache = "abcdefghijklmnopqrstuvxyzæøåABCDEFGHIJKLMNOPQRSTUVXYZÆØÅ!123456789:,;";
 
     // We use a texture atlas to pack many glyphs from a font into a single texture
     texture_atlas_t* atlas = texture_atlas_new(512, 512, 1);
@@ -94,7 +94,7 @@ int main()
         while (lag > fixed_time_step)
         {
             // Game Logic
-            dog_sprite.set_angle_in_degrees(dog_sprite.get_angle_in_degrees() + 5.0f);
+            //dog_sprite.set_angle_in_degrees(dog_sprite.get_angle_in_degrees() + 5.0f);
 
             // Reduce lag
             lag -= fixed_time_step;
@@ -105,7 +105,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         renderer2d.render_sprite(dog_sprite);
-        renderer2d.render_text(*font, "b", glm::vec2());
+        renderer2d.render_text(*font, "Multiline\ntext! :D", glm::vec2(0.0f, 100.0f));
 
         glfwSwapBuffers(window);
         glfwPollEvents();

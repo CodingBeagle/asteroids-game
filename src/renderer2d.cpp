@@ -60,10 +60,15 @@ Renderer2d::Renderer2d()
     std::string vertex_shader_source_code = read_text_file("dat/shaders/vertex.glsl");
     std::string fragment_shader_source_code = read_text_file("dat/shaders/fragment.glsl");
 
+    // Sprite Shader
     Shader vertex_shader(GL_VERTEX_SHADER, vertex_shader_source_code);
     Shader fragment_shader(GL_FRAGMENT_SHADER, fragment_shader_source_code);
-
     m_default_shader_program = std::move(ShaderProgram(vertex_shader, fragment_shader));
+
+    // Text Shader
+    std::string fragment_text_shader_source_code = read_text_file("dat/shaders/fragment-text.glsl");
+    Shader fragment_text_shader(GL_FRAGMENT_SHADER, fragment_text_shader_source_code);
+    m_default_text_shader_program = std::move(ShaderProgram(vertex_shader, fragment_text_shader));
 
     // OpenGL requires that at least one VAO be created whenever shaders are being used
     GLuint vao;
@@ -159,7 +164,8 @@ void Renderer2d::render_sprite(const Sprite &sprite)
 
 void Renderer2d::render_text(texture_font_t &texture_font, std::string text, glm::vec2 position)
 {
-    // TODO: Make code compatible with UTF8 (might have to not use std::string?)
+    // TODO: Make code compatible with UTF8 (might have to not use std::string?), or does it already work???
+    // Right now text rendering will only work with ascii chars
 
     // Loop through each character
     // Get glyph information for character
@@ -168,24 +174,39 @@ void Renderer2d::render_text(texture_font_t &texture_font, std::string text, glm
     // Set shader uniforms
 
     // Activate default shader program
-    m_default_shader_program.activate();
+    m_default_text_shader_program.activate();
 
     // Bind font texture
     glBindTexture(GL_TEXTURE_2D, texture_font.atlas->id);
 
+    float x_cursor = 0.0f;
+    float y_cursor = 0.0f;
+
     for (char &character : text)
     {
+        if (character == '\n')
+        {
+            x_cursor = 0.0f;
+            y_cursor += texture_font.height;
+            continue;
+        }
+
         texture_glyph_t* glyph_info = texture_font_get_glyph(&texture_font, &character);
 
         // MODEL MATRIX
         glm::mat4 model_matrix = glm::mat4(1.0f);
-        model_matrix = glm::translate(model_matrix, glm::vec3(0.0f, 0.0f, 0.0f));
+
+        model_matrix = glm::translate(model_matrix, glm::vec3(
+            position.x + (glyph_info->width / 2.0f) + x_cursor + glyph_info->offset_x,
+            y_cursor + position.y + (glyph_info->height / 2.0f) - glyph_info->offset_y,
+            0.0f));
+
         model_matrix = glm::scale(model_matrix, glm::vec3(glyph_info->width, glyph_info->height, 0.0f));
 
         // VIEW MATRIX
         glm::mat4 view_matrix = glm::mat4(1.0f);
-        view_matrix = glm::translate(view_matrix, glm::vec3(m_camera_offset_width, m_camera_offset_height, 0.0f));
-        view_matrix = glm::translate(view_matrix, -1.0f * glm::vec3(m_camera_position, 0.0f));
+        // view_matrix = glm::translate(view_matrix, glm::vec3(m_camera_offset_width, m_camera_offset_height, 0.0f));
+        // view_matrix = glm::translate(view_matrix, -1.0f * glm::vec3(m_camera_position, 0.0f));
 
         // Model-View Matrix
         glm::mat4 model_view_matrix = view_matrix * model_matrix;
@@ -199,6 +220,8 @@ void Renderer2d::render_text(texture_font_t &texture_font, std::string text, glm
         m_default_shader_program.set_uniform_value("texture_sub_rectangle", texture_sub_rectangle);
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        x_cursor += glyph_info->advance_x;
     }
 
     // OpenGL cleanup

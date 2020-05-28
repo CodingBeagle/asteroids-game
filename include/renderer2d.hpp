@@ -25,6 +25,7 @@ public:
 private:
     glm::mat4 m_projection;
     ShaderProgram m_default_shader_program;
+    ShaderProgram m_default_text_shader_program;
     glm::vec2 m_camera_position;
     float m_camera_offset_width;
     float m_camera_offset_height;
