@@ -36,8 +36,9 @@ Texture::Texture(std::string filepath)
 
     // Creating a storage for a texture and uploading pixels to it is done with glTexImage2D.
     // InternalFormat parameter (Parameter 3) = Tell OpenGL how you want the texture to be stored on the GPU.
-    // The External Format is defined by parameters "format", and "type". 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_texture_width, m_texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data.get());
+    // The External Format is defined by parameters "format", and "type".
+    // TODO: I'm assuming RGBA here... in reality I should be examining texture_components to upload the texture correctly
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_texture_width, m_texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data.get());
 
     // OpenGL can automatically generate mipmaps for us by calling glGenerateMipmap. This is typically sufficient for most applications.
     glGenerateMipmap(GL_TEXTURE_2D);

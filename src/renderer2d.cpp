@@ -162,8 +162,27 @@ void Renderer2d::render_sprite(const Sprite &sprite)
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
+void Renderer2d::render_sprite(const Sprite &sprite, glm::mat4 model_view_matrix)
+{
+    m_default_shader_program.activate();
+
+    sprite.activate_texture();
+
+    // VIEW MATRIX
+    glm::mat4 view_matrix = glm::mat4(1.0);
+
+    // Set shader uniforms
+    m_default_shader_program.set_uniform_value("proj_matrix", m_projection);
+    m_default_shader_program.set_uniform_value("mv_matrix", model_view_matrix);
+    m_default_shader_program.set_uniform_value("texture_sub_rectangle", sprite.get_sub_rectangle());
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
 void Renderer2d::render_text(texture_font_t &texture_font, std::string text, glm::vec2 position)
 {
+    // TODO: Make it possible to create meshes with entire text textures, so we can avoid draw calls per character.
+
     // TODO: Make code compatible with UTF8 (might have to not use std::string?), or does it already work???
     // Right now text rendering will only work with ascii chars
 
@@ -205,8 +224,6 @@ void Renderer2d::render_text(texture_font_t &texture_font, std::string text, glm
 
         // VIEW MATRIX
         glm::mat4 view_matrix = glm::mat4(1.0f);
-        // view_matrix = glm::translate(view_matrix, glm::vec3(m_camera_offset_width, m_camera_offset_height, 0.0f));
-        // view_matrix = glm::translate(view_matrix, -1.0f * glm::vec3(m_camera_position, 0.0f));
 
         // Model-View Matrix
         glm::mat4 model_view_matrix = view_matrix * model_matrix;
@@ -226,4 +243,39 @@ void Renderer2d::render_text(texture_font_t &texture_font, std::string text, glm
 
     // OpenGL cleanup
     glBindTexture(GL_TEXTURE_2D, 0);
+    m_default_text_shader_program.deactivate();
+}
+
+void Renderer2d::render_ui(const Sprite &widget, std::stack<glm::mat4> &matrix_stack)
+{
+    // Model-View Matrix
+    widget.activate_texture();
+
+    m_default_shader_program.activate();
+
+    matrix_stack.push(matrix_stack.top());
+
+    matrix_stack.top() *= glm::translate(glm::mat4(1.0f), glm::vec3(widget.get_position(), 0.0f));
+    matrix_stack.push(matrix_stack.top());
+    matrix_stack.top() *= glm::scale(glm::mat4(1.0f), glm::vec3(widget.get_size(), 0.0f));
+
+    // Render
+    m_default_shader_program.set_uniform_value("proj_matrix", m_projection);
+    m_default_shader_program.set_uniform_value("mv_matrix", matrix_stack.top());
+    m_default_shader_program.set_uniform_value("texture_sub_rectangle", widget.get_sub_rectangle());
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    // Remove scale
+    matrix_stack.pop();
+
+    for (auto widget : widget.get_children())
+    {
+        render_ui(*widget, matrix_stack);
+    }
+
+    // Remove transform
+    matrix_stack.pop();
+
+    m_default_shader_program.deactivate();
 }

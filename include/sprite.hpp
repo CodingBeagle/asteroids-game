@@ -5,6 +5,9 @@
 
 #include <texture.hpp>
 
+#include <memory>
+#include <vector>
+
 class Sprite
 {
 public:
@@ -18,13 +21,16 @@ public:
     float get_angle_in_degrees() const;
 
     glm::vec2 get_size() const;
-
     glm::vec4 get_sub_rectangle() const;
+
+    void add_child(const Sprite &sprite);
+    std::vector<std::shared_ptr<Sprite>> get_children() const;
 
     void set_absolute_scale(glm::vec2 scale);
 
     void activate_texture() const;
-private:
+protected:
+    std::vector<std::shared_ptr<Sprite>> m_children;
     const Texture &m_texture;
     glm::vec2 m_position;
     glm::vec2 m_scale;

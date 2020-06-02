@@ -11,9 +11,11 @@
 #include <shaderprogram.hpp>
 #include <shader.hpp>
 #include <sprite.hpp>
+#include <widget.hpp>
 
 #include <string>
 #include <memory>
+#include <stack>
 
 class Renderer2d
 {
@@ -21,7 +23,9 @@ public:
     Renderer2d();
 
     void render_sprite(const Sprite &sprite);
+    void render_sprite(const Sprite &sprite, glm::mat4 model_matrix);
     void render_text(texture_font_t &texture_font, std::string text, glm::vec2 position);
+    void render_ui(const Sprite &widget, std::stack<glm::mat4> &matrix_stack);
 private:
     glm::mat4 m_projection;
     ShaderProgram m_default_shader_program;

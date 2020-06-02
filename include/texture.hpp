@@ -11,6 +11,9 @@
 class Texture
 {
 public:
+    // TODO: Remember to remove this default constructor. Doesn't make sense right now.
+    Texture() {};
+
     Texture(std::string filepath);
 
     void activate() const;

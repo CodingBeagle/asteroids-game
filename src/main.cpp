@@ -11,6 +11,13 @@
 
 #include <freetype-gl/freetype-gl.h>
 
+#include <stack>
+
+void test_stack(std::stack<int> my_stack)
+{
+    my_stack.push(5);
+}
+
 int main()
 {
     // Initialize GLFW
@@ -74,6 +81,21 @@ int main()
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RED, atlas->width, atlas->height, 0, GL_RED, GL_UNSIGNED_BYTE, atlas->data );
 
+    // Test Sprites
+    Texture black_box_texture = Texture{"dat/textures/blackbox.png"};
+    Texture red_box_texture = Texture{"dat/textures/redbox.png"};
+
+    Sprite black_box_sprite = Sprite(black_box_texture);
+    black_box_sprite.set_absolute_scale(glm::vec2(25.0f, 15.0f));
+    black_box_sprite.set_position(glm::vec2(500.0f, 500.0f));
+
+    Sprite red_box_sprite = Sprite(red_box_texture);
+
+    black_box_sprite.add_child(red_box_sprite);
+
+    auto matrix_stack = std::stack<glm::mat4> {};
+    matrix_stack.push(glm::mat4(1.0f));
+
     // Game Loop variables
     double last_time = glfwGetTime();
     double lag = 0.0;
@@ -93,9 +115,6 @@ int main()
         // Update
         while (lag > fixed_time_step)
         {
-            // Game Logic
-            //dog_sprite.set_angle_in_degrees(dog_sprite.get_angle_in_degrees() + 5.0f);
-
             // Reduce lag
             lag -= fixed_time_step;
         }
@@ -104,8 +123,9 @@ int main()
         glClearColor(0.392f, 0.584f, 0.929f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        renderer2d.render_sprite(dog_sprite);
-        renderer2d.render_text(*font, "Multiline\ntext! :D", glm::vec2(0.0f, 100.0f));
+        renderer2d.render_ui(black_box_sprite, matrix_stack);
+
+        // renderer2d.render_ui(black_box_sprite, matrix_stack);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

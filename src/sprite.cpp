@@ -53,6 +53,18 @@ glm::vec4 Sprite::get_sub_rectangle() const
     return m_sub_rectangle;
 }
 
+void Sprite::add_child(const Sprite &sprite)
+{
+    // LEARN: Read up on std::make_shared
+    auto shared = std::make_shared<Sprite>(sprite);
+    m_children.push_back(shared);
+};
+
+std::vector<std::shared_ptr<Sprite>> Sprite::get_children() const
+{
+    return m_children;
+}
+
 void Sprite::set_absolute_scale(glm::vec2 scale)
 {
     m_size.x = m_sub_rectangle.x * scale.x;
