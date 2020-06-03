@@ -8,14 +8,28 @@
 #include <renderer2d.hpp>
 #include <texture.hpp>
 #include <sprite.hpp>
+#include <input.hpp>
 
 #include <freetype-gl/freetype-gl.h>
 
+#include <memory>
 #include <stack>
 
-void test_stack(std::stack<int> my_stack)
+void keyboard_callback(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods)
 {
-    my_stack.push(5);
+    Input* input_manager = static_cast<Input*>(glfwGetWindowUserPointer(glfwWindow));
+
+    input_manager->test();
+}
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    std::cout << "Mouse Clicked!" << std::endl;
+}
+
+void mouse_move_callback(GLFWwindow* window, double mouse_x_pos, double mouse_y_pos)
+{
+    std::cout << "{ Mouse X: " << mouse_x_pos << ", Mouse Y: " << mouse_y_pos << std::endl;
 }
 
 int main()
@@ -50,6 +64,16 @@ int main()
         std::cout << "Failed to initialize GLAD!" << std::endl;
         return -1;
     }
+
+    // Input Subsystem
+    std::shared_ptr<Input> input_manager{new Input()};
+
+    // Setup GLFW input
+    glfwSetKeyCallback(window, keyboard_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetCursorPosCallback(window, mouse_move_callback);
+
+    glfwSetWindowUserPointer(window, &input_manager);
 
     // Create 2D renderer
     Renderer2d renderer2d{};
@@ -124,8 +148,6 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         renderer2d.render_ui(black_box_sprite, matrix_stack);
-
-        // renderer2d.render_ui(black_box_sprite, matrix_stack);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

@@ -29,6 +29,10 @@ public:
     void set_absolute_scale(glm::vec2 scale);
 
     void activate_texture() const;
+
+    virtual void update(double dt) {
+        // Default empty behaviour
+    };
 protected:
     std::vector<std::shared_ptr<Sprite>> m_children;
     const Texture &m_texture;
