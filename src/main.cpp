@@ -8,6 +8,7 @@
 #include <renderer2d.hpp>
 #include <texture.hpp>
 #include <sprite.hpp>
+#include <buttonwidget.hpp>
 #include <input.hpp>
 
 #include <freetype-gl/freetype-gl.h>
@@ -112,7 +113,7 @@ int main()
     Texture black_box_texture = Texture{"dat/textures/blackbox.png"};
     Texture red_box_texture = Texture{"dat/textures/redbox.png"};
 
-    Sprite black_box_sprite = Sprite(black_box_texture);
+    ButtonWidget black_box_sprite = ButtonWidget(*input_manager, black_box_texture);
     black_box_sprite.set_absolute_scale(glm::vec2(25.0f, 15.0f));
     black_box_sprite.set_position(glm::vec2(500.0f, 500.0f));
 
@@ -140,27 +141,12 @@ int main()
         lag += elapsed_time;
 
         // Process Input
-        if (input_manager->was_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT))
-        {
-            std::cout << "mouse button pressed!! :D " << counter << std::endl;
-            counter++;
-        }
-
-        if (input_manager->is_keyboard_key_down(GLFW_KEY_SPACE))
-        {
-            std::cout << "Oh lordy you jumpin' ain't ya? " << counter << std::endl;
-            counter++;
-        }
-
-        if (input_manager->was_keyboard_key_pressed(GLFW_KEY_UP))
-        {
-            std::cout << "Pressed dat up button! :D " << counter << std::endl;
-            counter++;
-        }
 
         // Update
         while (lag > fixed_time_step)
         {
+            renderer2d.update_ui(black_box_sprite);
+
             // Reduce lag
             lag -= fixed_time_step;
         }

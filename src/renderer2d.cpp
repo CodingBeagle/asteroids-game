@@ -246,6 +246,16 @@ void Renderer2d::render_text(texture_font_t &texture_font, std::string text, glm
     m_default_text_shader_program.deactivate();
 }
 
+void Renderer2d::update_ui(Sprite &widget)
+{
+    widget.update(0.0);
+
+    for (auto widget : widget.get_children())
+    {
+        update_ui(*widget);
+    }
+}
+
 void Renderer2d::render_ui(const Sprite &widget, std::stack<glm::mat4> &matrix_stack)
 {
     // Model-View Matrix

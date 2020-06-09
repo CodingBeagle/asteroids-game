@@ -41,7 +41,8 @@ target_sources(asteroidsgame
                 src/renderer2d.cpp
                 src/widget.cpp
                 src/containerwidget.cpp
-                src/input.cpp)
+                src/input.cpp
+                src/buttonwidget.cpp)
                 
 # Add GLFW header files to search path for build
 target_include_directories(asteroidsgame PUBLIC "dependencies/GLFW/include")
