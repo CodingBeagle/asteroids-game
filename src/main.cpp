@@ -15,21 +15,23 @@
 #include <memory>
 #include <stack>
 
-void keyboard_callback(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods)
+void keyboard_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    Input* input_manager = static_cast<Input*>(glfwGetWindowUserPointer(glfwWindow));
-
-    input_manager->test();
+    Input* input_manager = static_cast<Input*>(glfwGetWindowUserPointer(window));
+    input_manager->keyboard_button_event(key, scancode, action, mods);
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-    std::cout << "Mouse Clicked!" << std::endl;
+    Input* input_manager = static_cast<Input*>(glfwGetWindowUserPointer(window));
+    input_manager->mouse_button_event(button, action, mods);
 }
 
 void mouse_move_callback(GLFWwindow* window, double mouse_x_pos, double mouse_y_pos)
 {
-    std::cout << "{ Mouse X: " << mouse_x_pos << ", Mouse Y: " << mouse_y_pos << std::endl;
+    auto ptr = glfwGetWindowUserPointer(window);
+    Input* input_manager = static_cast<Input*>(ptr);
+    input_manager->mouse_move_event(mouse_x_pos, mouse_y_pos);
 }
 
 int main()
@@ -66,14 +68,14 @@ int main()
     }
 
     // Input Subsystem
-    std::shared_ptr<Input> input_manager{new Input()};
+    Input* input_manager = new Input();
 
     // Setup GLFW input
     glfwSetKeyCallback(window, keyboard_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetCursorPosCallback(window, mouse_move_callback);
 
-    glfwSetWindowUserPointer(window, &input_manager);
+    glfwSetWindowUserPointer(window, input_manager);
 
     // Create 2D renderer
     Renderer2d renderer2d{};
@@ -97,6 +99,7 @@ int main()
 
     auto waitwut = texture_font_load_glyphs(font, cache);
     
+    // TODO: Need to somehow make my texture class my flexible, so I can make these kinds of textures as well
     glGenTextures( 1, &atlas->id );
     glBindTexture( GL_TEXTURE_2D, atlas->id );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -128,6 +131,8 @@ int main()
     // Disable v-sync
     glfwSwapInterval(0);
 
+    int counter = 0;
+
     while (!glfwWindowShouldClose(window)) {
         double current_time = glfwGetTime();
         double elapsed_time = current_time - last_time;
@@ -135,6 +140,23 @@ int main()
         lag += elapsed_time;
 
         // Process Input
+        if (input_manager->was_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT))
+        {
+            std::cout << "mouse button pressed!! :D " << counter << std::endl;
+            counter++;
+        }
+
+        if (input_manager->is_keyboard_key_down(GLFW_KEY_SPACE))
+        {
+            std::cout << "Oh lordy you jumpin' ain't ya? " << counter << std::endl;
+            counter++;
+        }
+
+        if (input_manager->was_keyboard_key_pressed(GLFW_KEY_UP))
+        {
+            std::cout << "Pressed dat up button! :D " << counter << std::endl;
+            counter++;
+        }
 
         // Update
         while (lag > fixed_time_step)
@@ -150,6 +172,8 @@ int main()
         renderer2d.render_ui(black_box_sprite, matrix_stack);
 
         glfwSwapBuffers(window);
+
+        input_manager->late_update();
         glfwPollEvents();
     }
 
