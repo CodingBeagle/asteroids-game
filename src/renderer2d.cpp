@@ -258,6 +258,9 @@ void Renderer2d::update_ui(Sprite &widget)
 
 void Renderer2d::render_ui(const Sprite &widget, std::stack<glm::mat4> &matrix_stack)
 {
+    auto widget_position = widget.get_position();
+    auto widget_size = widget.get_size();
+
     // Model-View Matrix
     widget.activate_texture();
 
@@ -265,7 +268,12 @@ void Renderer2d::render_ui(const Sprite &widget, std::stack<glm::mat4> &matrix_s
 
     matrix_stack.push(matrix_stack.top());
 
-    matrix_stack.top() *= glm::translate(glm::mat4(1.0f), glm::vec3(widget.get_position(), 0.0f));
+    // TODO: I anchor UI elements at top-left corner by adding with half its dimension on x and y...
+    // Perhaps I should change this at some point??
+    matrix_stack.top() *= glm::translate(
+        glm::mat4(1.0f), 
+        glm::vec3(widget_position.x + (widget_size.x / 2.0), widget_position.y + (widget_size.y / 2.0), 0.0f));
+
     matrix_stack.push(matrix_stack.top());
     matrix_stack.top() *= glm::scale(glm::mat4(1.0f), glm::vec3(widget.get_size(), 0.0f));
 

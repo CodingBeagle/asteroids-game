@@ -115,11 +115,7 @@ int main()
 
     ButtonWidget black_box_sprite = ButtonWidget(*input_manager, black_box_texture);
     black_box_sprite.set_absolute_scale(glm::vec2(25.0f, 15.0f));
-    black_box_sprite.set_position(glm::vec2(500.0f, 500.0f));
-
-    Sprite red_box_sprite = Sprite(red_box_texture);
-
-    black_box_sprite.add_child(red_box_sprite);
+    black_box_sprite.set_position(glm::vec2(100.0f, 100.0f));
 
     auto matrix_stack = std::stack<glm::mat4> {};
     matrix_stack.push(glm::mat4(1.0f));
@@ -132,8 +128,6 @@ int main()
     // Disable v-sync
     glfwSwapInterval(0);
 
-    int counter = 0;
-
     while (!glfwWindowShouldClose(window)) {
         double current_time = glfwGetTime();
         double elapsed_time = current_time - last_time;
@@ -141,12 +135,16 @@ int main()
         lag += elapsed_time;
 
         // Process Input
+        // TODO: It doesn't appear to be good to process things dependent on input inside the
+        // fixed frame update loop, as it spends the majority of its time NOT being run.
+        // This means that it's easy to miss events such as the frame when a key is pressed.
+        // What's the usual solution for this?
+        renderer2d.update_ui(black_box_sprite);
 
         // Update
+        auto counter = 0;
         while (lag > fixed_time_step)
         {
-            renderer2d.update_ui(black_box_sprite);
-
             // Reduce lag
             lag -= fixed_time_step;
         }
